@@ -344,6 +344,71 @@ function () {
 }();
 
 exports.Paddle = Paddle;
+},{}],"Collison.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Collison = void 0;
+
+var Collison =
+/** @class */
+function () {
+  function Collison() {}
+
+  Collison.prototype.isCollidingBrick = function (ball, brick) {
+    if (ball.pos.x < brick.pos.x + brick.width && ball.pos.x + ball.width > brick.pos.x && ball.pos.y < brick.pos.y + brick.height && ball.pos.y + ball.height > brick.pos.y) {
+      return true;
+    }
+
+    return false;
+  }; // check ball collison with bricks
+
+
+  Collison.prototype.isCollidingBricks = function (ball, bricks) {
+    var _this = this;
+
+    var colliding = false;
+    bricks.forEach(function (brick, i) {
+      if (_this.isCollidingBrick(ball, brick)) {
+        ball.changeYDirection();
+
+        if (brick.energy === 1) {
+          bricks.splice(i, 1);
+        } else {
+          brick.energy -= 1;
+        }
+
+        colliding = true;
+      }
+    });
+    return colliding;
+  };
+
+  Collison.prototype.checkBallCollison = function (ball, paddle, view) {
+    // 1. check ball collison with paddle
+    if (ball.pos.x + ball.width > paddle.pos.x && ball.pos.x < paddle.pos.x + paddle.width && ball.pos.y + ball.height === paddle.pos.y // hit the corner
+    ) {
+        ball.changeYDirection();
+      } // 2. check ball collison with walls
+    // ball movement X constraintes
+
+
+    if (ball.pos.x > view.canvas.width - ball.width || ball.pos.x < 0) {
+      ball.changeXDirection();
+    } // Ball movement Y constarintes
+
+
+    if (ball.pos.y < 0) {
+      ball.changeYDirection();
+    }
+  };
+
+  return Collison;
+}();
+
+exports.Collison = Collison;
 },{}],"images/paddle.png":[function(require,module,exports) {
 module.exports = "/paddle.f48d929a.png";
 },{}],"images/ball.png":[function(require,module,exports) {
@@ -402,7 +467,7 @@ var PADDLE_STARTX = 450;
 exports.PADDLE_STARTX = PADDLE_STARTX;
 var PADDLE_SPEED = 10;
 exports.PADDLE_SPEED = PADDLE_SPEED;
-var BALL_SPEED = 5;
+var BALL_SPEED = 2;
 exports.BALL_SPEED = BALL_SPEED;
 var BALL_SIZE = 20;
 exports.BALL_SIZE = BALL_SIZE;
@@ -547,6 +612,8 @@ var _Ball = require("./sprites/Ball");
 
 var _Paddle = require("./sprites/Paddle");
 
+var _Collison = require("./Collison");
+
 var _paddle = _interopRequireDefault(require("./images/paddle.png"));
 
 var _ball = _interopRequireDefault(require("./images/ball.png"));
@@ -573,7 +640,7 @@ function setGameWin(view) {
   gameOver = false;
 }
 
-function gameLoop(view, bricks, paddle, ball) {
+function gameLoop(view, bricks, paddle, ball, collision) {
   view.clear();
   view.drawBricks(bricks);
   view.drawSprite(paddle);
@@ -585,8 +652,25 @@ function gameLoop(view, bricks, paddle, ball) {
     paddle.movePaddle();
   }
 
+  collision.checkBallCollison(ball, paddle, view);
+  var collidingBrick = collision.isCollidingBricks(ball, bricks);
+
+  if (collidingBrick) {
+    score += 1;
+    view.drawSocre(score);
+  } // Game over when ball leaves playfield
+
+
+  if (ball.pos.y > view.canvas.height) gameOver = true; // if game won, set gameOver and display win
+
+  if (bricks.length === 0) {
+    return setGameWin(view);
+  } // return if gameOver and don't run the requestAnimationFrame
+
+
+  if (gameOver) return setGameOver(view);
   requestAnimationFrame(function () {
-    return gameLoop(view, bricks, paddle, ball);
+    return gameLoop(view, bricks, paddle, ball, collision);
   });
 }
 
@@ -594,7 +678,9 @@ function startGame(view) {
   // Reset the display
   score = 0;
   view.drawInfo('');
-  view.drawSocre(0); // Create all bricks
+  view.drawSocre(0); // Create a collasion instance
+
+  var collision = new _Collison.Collison(); // Create all bricks
 
   var bricks = (0, _helpers.createBricks)(); // Create Paddle
 
@@ -607,13 +693,13 @@ function startGame(view) {
     x: _setup.BALL_STARTX,
     y: _setup.BALL_STARTY
   }, _ball.default);
-  gameLoop(view, bricks, paddle, ball);
+  gameLoop(view, bricks, paddle, ball, collision);
 } // Create a new view
 
 
 var view = new _CanvasView.CanvasView('#playField');
 view.initStartButton(startGame);
-},{"./view/CanvasView":"view/CanvasView.ts","./sprites/Ball":"sprites/Ball.ts","./sprites/Paddle":"sprites/Paddle.ts","./images/paddle.png":"images/paddle.png","./images/ball.png":"images/ball.png","./setup":"setup.ts","./helpers":"helpers.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./view/CanvasView":"view/CanvasView.ts","./sprites/Ball":"sprites/Ball.ts","./sprites/Paddle":"sprites/Paddle.ts","./Collison":"Collison.ts","./images/paddle.png":"images/paddle.png","./images/ball.png":"images/ball.png","./setup":"setup.ts","./helpers":"helpers.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -641,7 +727,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "10239" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "2768" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
