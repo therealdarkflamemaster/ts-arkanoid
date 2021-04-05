@@ -153,7 +153,7 @@ function () {
   };
 
   CanvasView.prototype.drawSocre = function (score) {
-    if (this.socreDisplay) this.socreDisplay.innerHTML = score.toString();
+    if (this.socreDisplay) this.socreDisplay.innerHTML = "Score: " + score.toString();
   };
 
   CanvasView.prototype.drawInfo = function (text) {
@@ -727,7 +727,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "2768" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "2420" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

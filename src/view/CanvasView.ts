@@ -30,7 +30,7 @@ export class CanvasView {
     }
 
     drawSocre(score : number) : void {
-        if (this.socreDisplay) this.socreDisplay.innerHTML = score.toString();
+        if (this.socreDisplay) this.socreDisplay.innerHTML = "Score: "+ score.toString();
     }
 
     drawInfo(text : string) : void {

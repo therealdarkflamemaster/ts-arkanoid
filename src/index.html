@@ -13,6 +13,16 @@
         <button id="start">Start</button>
         <div id="info">Press play!</div>
       </div>
+      <div>
+        <div id='display-info'>
+          Infos :
+          <p>Red : 1</p>
+          <p>Green : 2</p>
+          <p>Yellow : 3</p>
+          <p>Blue : 4</p>
+          <p>Purple : 5</p>
+        </div>
+      </div>
     </div>
     <script src="./index.ts"></script>
   </body>
@@ -49,6 +59,15 @@
       display: flex;
       justify-content: space-between;
       width: var(--width);
+    }
+
+    #display-info {
+      margin-top: 50px;
+      margin-bottom: 40px;
+      font-size: 14px;
+      border-top: 1px solid grey;
+      border-left: 1px solid grey;
+      border-right: 1px solid grey;
     }
 
     #score,
